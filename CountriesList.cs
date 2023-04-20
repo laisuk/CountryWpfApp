@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Windows;
 
 public class CountriesList
 {
@@ -14,7 +16,7 @@ public class CountriesList
             var jsonText = File.ReadAllText(filePath);
             var countryData = JsonSerializer.Deserialize<List<AllCountries>>(jsonText);
             IEnumerable<AllCountries> query = countryData!.OrderBy(AllCountries => AllCountries?.name?.common);
-      
+
             return query.ToList();
             //return countryData!;
 
@@ -66,7 +68,51 @@ public class CountriesList
 
     public string getJsonFileDate(string filePath)
     {
-        return File.GetCreationTime(filePath).ToString();
+        //return File.GetCreationTime(filePath).ToString();
+        return File.GetLastWriteTime(filePath).ToString();
+    }
+
+    public async void updateJsonDataFile(string filePath)
+    {
+        string allCountryUrl = @"https://restcountries.com/v3.1/all";
+        string backupFilePath = @".\Data\all.json.bak";
+
+        if (File.Exists(filePath))
+        {
+            try
+            {
+                File.Copy(filePath, backupFilePath, true);
+                //string sucessMassage = $"File backup done: {backupFilePath} @ " + getJsonFileDate(backupFilePath);
+                //MessageBox.Show(sucessMassage, "File Backup");
+            }
+            catch (Exception ex)
+            {
+                string errorMassage = "File backup error: " + ex.Message;
+                MessageBox.Show(errorMassage, getJsonFileDate(filePath));
+
+                throw;
+            }
+        }
+
+        using (var client = new HttpClient())
+        {
+            var response = await client.GetAsync(allCountryUrl);
+            var content = await response.Content.ReadAsStringAsync();        
+
+            try
+            {
+                File.WriteAllText(filePath, content);
+                string sucessMassage = $"File update SUCCESS: {filePath} @ " + getJsonFileDate(filePath);
+                MessageBox.Show(sucessMassage, "JSON Data File Update");
+            }
+            catch (Exception ex)
+            {
+                string errorMassage = "File update error: " + ex.Message;
+                MessageBox.Show(errorMassage, getJsonFileDate(filePath));
+
+                throw;
+            }
+        }
     }
 }
 

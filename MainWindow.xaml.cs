@@ -86,6 +86,8 @@ namespace CountryWpfApp
 
         private void btnUpdateData_Click(object sender, RoutedEventArgs e)
         {
+            countryList.updateJsonDataFile(countryFilePath);
+            lblFileDate.Content = countryList.getJsonFileDate(countryFilePath);
 
         }
     }
