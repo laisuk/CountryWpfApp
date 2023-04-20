@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -14,8 +13,7 @@ namespace CountryWpfApp
     {
         public static string countryFilePath = @".\Data\all.json";
         public static CountriesList countryList = new();
-        List<AllCountries> allCountryData = countryList.getAllCountryData(countryFilePath);    
-        
+        List<AllCountries> allCountryData = countryList.getAllCountryData(countryFilePath);
 
         public MainWindow()
         {
@@ -25,6 +23,7 @@ namespace CountryWpfApp
             var countryNameList = countryList.getAllCountryList(allCountryData);
             cbCountryCode.ItemsSource = countryNameList;
             cbCountryCode.SelectedIndex = -1;
+            lblFileDate.Content = countryList.getJsonFileDate(countryFilePath);
         }
 
         private void cbCountryCode_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
@@ -38,7 +37,6 @@ namespace CountryWpfApp
         {
             var currentCountry = countryList.getCurrentCountry(allCountryData, cbCountryCode.SelectedIndex);
             fillCountryForm(currentCountry);
-
         }
 
         private void fillCountryForm(AllCountries countryModel)
@@ -54,8 +52,8 @@ namespace CountryWpfApp
 
                 tbLanguages.Text = countryList.getLanguages(countryModel!);
 
-                tbArea.Text = countryModel?.area.ToString();
-                tbLatLng.Text = $"{countryModel?.latlng?[0]} : {countryModel?.latlng?[1]}";
+                tbArea.Text = countryModel?.area + " km²";
+                tbLatLng.Text = $"{countryModel?.latlng?[0]}° : {countryModel?.latlng?[1]}°";
                 tbPopulation.Text = countryModel?.population.ToString();
 
                 if (countryModel?.borders != null)
@@ -66,26 +64,29 @@ namespace CountryWpfApp
                 {
                     tbBorder.Text = "None";
                 }
-                
-                tbCar.Text = countryModel?.car?.side;
+
+                tbCar.Text = countryModel?.car?.side?.ToUpper();
                 tbTimeZone.Text = countryModel?.timezones?[0];
-                tbStartOfWeek.Text = countryModel?.startOfWeek;
+                tbStartOfWeek.Text = countryModel?.startOfWeek?.ToUpper();
 
                 string currencies = countryList.getCurrencies(allCountryData[cbCountryCode.SelectedIndex]);
                 tbCurrency.Text = currencies;
-                
-                Uri uri = new Uri(countryModel?.flags?.png!);               
-                imgFlag.Source = new BitmapImage(uri);
 
+                Uri uri = new Uri(countryModel?.flags?.png!);
+                imgFlag.Source = new BitmapImage(uri);
+                imgFlag.ToolTip = countryModel?.flags?.alt!;
 
             }
         }
 
         private void btnExit_Click(object sender, RoutedEventArgs e)
         {
-            Close();    
+            Close();
+        }
+
+        private void btnUpdateData_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
-
-    
 }
