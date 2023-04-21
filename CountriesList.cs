@@ -12,6 +12,7 @@ using System.Windows.Controls;
 
 public class CountriesList
 {
+
     public List<AllCountries> getAllCountryData(string filePath)
     {
         try
@@ -63,6 +64,8 @@ public class CountriesList
     public string getCurrenciesMod(AllCountries allCountries)
     {
         List<string> currencyList = new List<string>();
+        List<MYR> currencyList1 = new List<MYR>();
+        string[] strings = Array.Empty<string>();
         PropertyInfo[] propertyInfo = typeof(Currencies).GetProperties();
         foreach (PropertyInfo property in propertyInfo)
         {
@@ -75,6 +78,36 @@ public class CountriesList
         }
         var jsonCurrencyText = "[" + string.Join(",", currencyList) + "]";
         var currencyData = JsonSerializer.Deserialize<List<MYR>>(jsonCurrencyText!);
+        var currencyDataSorted = currencyData?
+            .Select(x => $"{x.name} ({x.symbol})")
+            .ToList();
+        var currencies = string.Join(",\n", currencyDataSorted!);
+
+        return currencies;
+    }
+
+    public string getCurrenciesModified(AllCountries allCountries)
+    {
+        List<MYR> currencyData = new List<MYR>();
+
+        PropertyInfo[] propertyInfo = typeof(Currencies).GetProperties();
+
+        foreach (PropertyInfo property in propertyInfo)
+        {
+            var _curency = property.GetValue(allCountries.currencies, null);
+            if (_curency != null)
+            {
+                List<string> _strings = new List<string>();
+
+                foreach (PropertyInfo property1 in _curency.GetType().GetProperties())
+                {
+                    _strings.Add(property1.GetValue(_curency, null)?.ToString()!);
+                }
+
+                currencyData.Add(new MYR() { name = _strings[0], symbol = _strings[1] });
+            }
+        }
+
         var currencyDataSorted = currencyData?
             .Select(x => $"{x.name} ({x.symbol})")
             .ToList();

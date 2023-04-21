@@ -30,9 +30,10 @@ namespace CountryWpfApp
 
         private void cbCountryCode_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
-            string message = $"{cbCountryCode.SelectedIndex}: [{cbCountryCode.SelectedItem}] selected.";
+            //string message = $"{cbCountryCode.SelectedIndex}: [{cbCountryCode.SelectedItem}] selected.";
             //string title = "Country Selected";
             //MessageBox.Show(message, title);
+            return;
         }
 
         private void btnGetInfo_Click(object sender, RoutedEventArgs e)
@@ -64,7 +65,7 @@ namespace CountryWpfApp
                 tbTimeZone.Text = countryModel?.timezones?[0];
                 tbStartOfWeek.Text = countryModel?.startOfWeek?.ToUpper();
 
-                string currencies = countryList.getCurrenciesMod(allCountryData[cbCountryCode.SelectedIndex]);
+                string currencies = countryList.getCurrenciesModified(allCountryData[cbCountryCode.SelectedIndex]);
                 tbCurrency.Text = currencies;
 
                 Uri uri = new Uri(countryModel?.flags?.png!);
