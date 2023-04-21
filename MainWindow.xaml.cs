@@ -89,7 +89,7 @@ namespace CountryWpfApp
         private void btnUpdateData_Click(object sender, RoutedEventArgs e)
         {
             countryList.updateJsonDataFile(countryFilePath);
-            allCountryData = countryList.getAllCountryData(countryFilePath);
+            
 
             var length = 100;
 
@@ -101,14 +101,16 @@ namespace CountryWpfApp
                     {
                         lblFileDate.Content = $"Updating...({i})";
                     }), DispatcherPriority.Render);
-                    Thread.Sleep(20);
+                    Thread.Sleep(20);                    
+                }
 
-                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        lblFileDate.Content = countryList.getJsonFileDate(countryFilePath);
-                    }), DispatcherPriority.Render);
-                }       
-            });   
+                Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    lblFileDate.Content = countryList.getJsonFileDate(countryFilePath);
+                }), DispatcherPriority.Render);
+            });
+
+            allCountryData = countryList.getAllCountryData(countryFilePath);
 
         }
     }

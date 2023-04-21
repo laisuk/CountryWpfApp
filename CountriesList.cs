@@ -99,7 +99,7 @@ public class CountriesList
         using (var client = new HttpClient())
         {
             var response = await client.GetAsync(allCountryUrl);
-            var content = await response.Content.ReadAsStringAsync();        
+            var content = await response.Content.ReadAsStringAsync();
 
             try
             {
@@ -115,7 +115,7 @@ public class CountriesList
                 throw;
             }
         }
-        
+
     }
 }
 
