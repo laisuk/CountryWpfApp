@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Controls;
 
 public class CountriesList
 {
@@ -58,6 +60,29 @@ public class CountriesList
         //return jsonAllCurency;
     }
 
+    public string getCurrenciesMod(AllCountries allCountries)
+    {
+        List<string> currencyList = new List<string>();
+        PropertyInfo[] propertyInfo = typeof(Currencies).GetProperties();
+        foreach (PropertyInfo property in propertyInfo)
+        {
+            var _curency = property.GetValue(allCountries.currencies, null);
+            if (_curency != null)
+            {
+                string _jsonCurrency = JsonSerializer.Serialize(_curency, property.PropertyType);
+                currencyList.Add(_jsonCurrency);
+            }
+        }
+        var jsonCurrencyText = "[" + string.Join(",", currencyList) + "]";
+        var currencyData = JsonSerializer.Deserialize<List<MYR>>(jsonCurrencyText!);
+        var currencyDataSorted = currencyData?
+            .Select(x => $"{x.name} ({x.symbol})")
+            .ToList();
+        var currencies = string.Join(",\n", currencyDataSorted!);
+
+        return currencies;
+    }
+
     public string getLanguages(AllCountries allCountries)
     {
         var languages = JsonSerializer.Serialize(allCountries.languages);
@@ -66,6 +91,37 @@ public class CountriesList
         var languageList = string.Join(", ", countryLanguage);
 
         return languageList;
+    }
+
+    public string getLanguagesMod(AllCountries allCountries)
+    {
+        List<string> languagesMod = new List<string>();
+        PropertyInfo[] properties = typeof(Languages).GetProperties();
+        foreach (PropertyInfo property in properties)
+        {
+            var _languege = property.GetValue(allCountries.languages, null);
+
+            if (_languege != null)
+            {
+                languagesMod.Add(_languege.ToString()!);
+            }
+        }
+
+        var languageList = string.Join(", ", languagesMod);
+
+        return languageList;
+    }
+
+    public string getBorders(AllCountries allCountries)
+    {
+        if (allCountries?.borders != null)
+        {
+            return String.Join(", ", allCountries?.borders!);
+        }
+        else
+        {
+            return "None";
+        }
     }
 
     public string getJsonFileDate(string filePath)

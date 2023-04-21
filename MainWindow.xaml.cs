@@ -52,26 +52,19 @@ namespace CountryWpfApp
                 tbRegion.Text = countryModel?.region;
                 tbSubRegion.Text = countryModel?.subregion;
 
-                tbLanguages.Text = countryList.getLanguages(countryModel!);
+                tbLanguages.Text = countryList.getLanguagesMod(countryModel!);
 
                 tbArea.Text = countryModel?.area + " km²";
                 tbLatLng.Text = $"{countryModel?.latlng?[0]}° : {countryModel?.latlng?[1]}°";
                 tbPopulation.Text = countryModel?.population.ToString();
 
-                if (countryModel?.borders != null)
-                {
-                    tbBorder.Text = String.Join(", ", countryModel?.borders!);
-                }
-                else
-                {
-                    tbBorder.Text = "None";
-                }
+                tbBorder.Text = countryList.getBorders(countryModel!);
 
                 tbCar.Text = countryModel?.car?.side?.ToUpper();
                 tbTimeZone.Text = countryModel?.timezones?[0];
                 tbStartOfWeek.Text = countryModel?.startOfWeek?.ToUpper();
 
-                string currencies = countryList.getCurrencies(allCountryData[cbCountryCode.SelectedIndex]);
+                string currencies = countryList.getCurrenciesMod(allCountryData[cbCountryCode.SelectedIndex]);
                 tbCurrency.Text = currencies;
 
                 Uri uri = new Uri(countryModel?.flags?.png!);
@@ -89,7 +82,6 @@ namespace CountryWpfApp
         private void btnUpdateData_Click(object sender, RoutedEventArgs e)
         {
             countryList.updateJsonDataFile(countryFilePath);
-            
 
             var length = 100;
 
@@ -101,7 +93,7 @@ namespace CountryWpfApp
                     {
                         lblFileDate.Content = $"Updating...({i})";
                     }), DispatcherPriority.Render);
-                    Thread.Sleep(20);                    
+                    Thread.Sleep(20);
                 }
 
                 Application.Current.Dispatcher.BeginInvoke(new Action(() =>
