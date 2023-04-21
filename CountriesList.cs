@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CountryWpfApp;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,7 +19,6 @@ public class CountriesList
             IEnumerable<AllCountries> query = countryData!.OrderBy(AllCountries => AllCountries?.name?.common);
 
             return query.ToList();
-            //return countryData!;
 
         }
         catch (System.Exception)
@@ -45,12 +45,12 @@ public class CountriesList
     public string getCurrencies(AllCountries allCountries)
     {
         var jsonAllCurency = JsonSerializer.Serialize(allCountries.currencies);
-        var jsonCurrency = Regex.Matches(jsonAllCurency, "\\{\\\"name\\\":\\\"([\\w\\W]*?)\\\",\\\"symbol\\\":\\\"(.*?)\\\"\\}");
-        var jsonCurrency2 = jsonCurrency
-            .Select(x => $"{x.Value}");
-        var jsonCurrencyText = "[" + string.Join(",", jsonCurrency2) + "]";
+        var jsonCurrencyMatched = Regex.Matches(jsonAllCurency, "\\{\\\"name\\\":\\\"([\\w\\W]*?)\\\",\\\"symbol\\\":\\\"(.*?)\\\"\\}")
+            .ToList();
+        var jsonCurrencyText = "[" + string.Join(",", jsonCurrencyMatched) + "]";
         var currencyData = JsonSerializer.Deserialize<List<MYR>>(jsonCurrencyText!);
-        var currencyDataSorted = currencyData?.Select(x => $"{x.name} ({x.symbol})")
+        var currencyDataSorted = currencyData?
+            .Select(x => $"{x.name} ({x.symbol})")
             .ToList();
         var currencies = string.Join(",\n", currencyDataSorted!);
 
@@ -61,8 +61,10 @@ public class CountriesList
     public string getLanguages(AllCountries allCountries)
     {
         var languages = JsonSerializer.Serialize(allCountries.languages);
-        var countryLanguage = Regex.Matches(languages, "(?<=:\\\")\\w*(?=\\\")").ToList();
+        var countryLanguage = Regex.Matches(languages, "(?<=:\\\")\\w*(?=\\\")")
+            .ToList();
         var languageList = string.Join(", ", countryLanguage);
+
         return languageList;
     }
 
@@ -113,6 +115,7 @@ public class CountriesList
                 throw;
             }
         }
+        
     }
 }
 

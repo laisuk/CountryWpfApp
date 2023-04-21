@@ -4,3 +4,4 @@ Local country info data: all.json
 
 To-do:
 	1. Update country JSON file online => done
+	2. File update progres. => done

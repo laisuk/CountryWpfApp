@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace CountryWpfApp
 {
@@ -19,7 +22,6 @@ namespace CountryWpfApp
         {
             InitializeComponent();
 
-            //IEnumerable<AllCountries> query = allCountryData.OrderBy(AllCountries => AllCountries?.name?.common);
             var countryNameList = countryList.getAllCountryList(allCountryData);
             cbCountryCode.ItemsSource = countryNameList;
             cbCountryCode.SelectedIndex = -1;
@@ -58,7 +60,7 @@ namespace CountryWpfApp
 
                 if (countryModel?.borders != null)
                 {
-                    tbBorder.Text = String.Join(", ", countryModel?.borders?.Select(b => b)!);
+                    tbBorder.Text = String.Join(", ", countryModel?.borders!);
                 }
                 else
                 {
@@ -87,7 +89,26 @@ namespace CountryWpfApp
         private void btnUpdateData_Click(object sender, RoutedEventArgs e)
         {
             countryList.updateJsonDataFile(countryFilePath);
-            lblFileDate.Content = countryList.getJsonFileDate(countryFilePath);
+            allCountryData = countryList.getAllCountryData(countryFilePath);
+
+            var length = 100;
+
+            Task.Run(() =>
+            {
+                for (int i = 0; i <= length; i++)
+                {
+                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        lblFileDate.Content = $"Updating...({i})";
+                    }), DispatcherPriority.Render);
+                    Thread.Sleep(20);
+
+                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        lblFileDate.Content = countryList.getJsonFileDate(countryFilePath);
+                    }), DispatcherPriority.Render);
+                }       
+            });   
 
         }
     }
