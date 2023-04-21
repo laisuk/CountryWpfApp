@@ -1,5 +1,4 @@
-﻿using CountryWpfApp;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,7 +7,6 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Windows;
-using System.Windows.Controls;
 
 public class CountriesList
 {
@@ -64,8 +62,6 @@ public class CountriesList
     public string getCurrenciesMod(AllCountries allCountries)
     {
         List<string> currencyList = new List<string>();
-        List<MYR> currencyList1 = new List<MYR>();
-        string[] strings = Array.Empty<string>();
         PropertyInfo[] propertyInfo = typeof(Currencies).GetProperties();
         foreach (PropertyInfo property in propertyInfo)
         {
@@ -89,6 +85,7 @@ public class CountriesList
     public string getCurrenciesModified(AllCountries allCountries)
     {
         List<MYR> currencyData = new List<MYR>();
+        List<string> _strings = new List<string>();
 
         PropertyInfo[] propertyInfo = typeof(Currencies).GetProperties();
 
@@ -96,15 +93,13 @@ public class CountriesList
         {
             var _curency = property.GetValue(allCountries.currencies, null);
             if (_curency != null)
-            {
-                List<string> _strings = new List<string>();
-
+            {              
                 foreach (PropertyInfo property1 in _curency.GetType().GetProperties())
                 {
                     _strings.Add(property1.GetValue(_curency, null)?.ToString()!);
                 }
-
                 currencyData.Add(new MYR() { name = _strings[0], symbol = _strings[1] });
+                _strings.Clear();
             }
         }
 
