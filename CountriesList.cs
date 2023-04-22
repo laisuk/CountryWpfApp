@@ -163,7 +163,7 @@ public class CountriesList
 
     public string getDemonyms(AllCountries allCountries)
     {
-        var demonyms = $"{allCountries?.demonyms?.eng?.m} (M) {allCountries?.demonyms?.eng?.f} (F)";
+        var demonyms = $"{allCountries?.demonyms?.eng?.m} (M)\n{allCountries?.demonyms?.eng?.f} (F)";
         return demonyms;
     }
 

@@ -32,7 +32,8 @@ namespace CountryWpfApp
             //string message = $"{cbCountryCode.SelectedIndex}: [{cbCountryCode.SelectedItem}] selected.";
             //string title = "Country Selected";
             //MessageBox.Show(message, title);
-            return;
+            var currentCountry = countryList.getCurrentCountry(allCountryData, cbCountryCode.SelectedIndex);
+            fillCountryForm(currentCountry);
         }
 
         private void btnGetInfo_Click(object sender, RoutedEventArgs e)
