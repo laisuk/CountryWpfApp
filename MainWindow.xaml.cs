@@ -62,8 +62,12 @@ namespace CountryWpfApp
 
                 tbCar.Text = countryModel?.car?.side?.ToUpper();
                 tbTimeZone.Text = countryModel?.timezones?[0];
+                tbContinent.Text = countryList.getContinents(countryModel!);
+                tbDemonyms.Text = countryList.getDemonyms(countryModel!);
                 tbStartOfWeek.Text = countryModel?.startOfWeek?.ToUpper();
 
+                //string currencies = countryList.getCurrencies(allCountryData[cbCountryCode.SelectedIndex]);
+                //string currencies = countryList.getCurrenciesMod(allCountryData[cbCountryCode.SelectedIndex]);
                 string currencies = countryList.getCurrenciesModified(allCountryData[cbCountryCode.SelectedIndex]);
                 tbCurrency.Text = currencies;
 

@@ -49,7 +49,7 @@ public class CountriesList
         var jsonCurrencyMatched = Regex.Matches(jsonAllCurency, "\\{\\\"name\\\":\\\"([\\w\\W]*?)\\\",\\\"symbol\\\":\\\"(.*?)\\\"\\}")
             .ToList();
         var jsonCurrencyText = "[" + string.Join(",", jsonCurrencyMatched) + "]";
-        var currencyData = JsonSerializer.Deserialize<List<MYR>>(jsonCurrencyText!);
+        var currencyData = JsonSerializer.Deserialize<List<CurrencyRecord>>(jsonCurrencyText!);
         var currencyDataSorted = currencyData?
             .Select(x => $"{x.name} ({x.symbol})")
             .ToList();
@@ -65,15 +65,15 @@ public class CountriesList
         PropertyInfo[] propertyInfo = typeof(Currencies).GetProperties();
         foreach (PropertyInfo property in propertyInfo)
         {
-            var _curency = property.GetValue(allCountries.currencies, null);
-            if (_curency != null)
+            var _currency = property.GetValue(allCountries.currencies, null);
+            if (_currency != null)
             {
-                string _jsonCurrency = JsonSerializer.Serialize(_curency, property.PropertyType);
+                string _jsonCurrency = JsonSerializer.Serialize(_currency, property.PropertyType);
                 currencyList.Add(_jsonCurrency);
             }
         }
         var jsonCurrencyText = "[" + string.Join(",", currencyList) + "]";
-        var currencyData = JsonSerializer.Deserialize<List<MYR>>(jsonCurrencyText!);
+        var currencyData = JsonSerializer.Deserialize<List<CurrencyRecord>>(jsonCurrencyText!);
         var currencyDataSorted = currencyData?
             .Select(x => $"{x.name} ({x.symbol})")
             .ToList();
@@ -84,7 +84,7 @@ public class CountriesList
 
     public string getCurrenciesModified(AllCountries allCountries)
     {
-        List<MYR> currencyData = new List<MYR>();
+        List<CurrencyRecord> currencyData = new List<CurrencyRecord>();
         List<string> _strings = new List<string>();
 
         PropertyInfo[] propertyInfo = typeof(Currencies).GetProperties();
@@ -98,13 +98,13 @@ public class CountriesList
                 {
                     _strings.Add(property1.GetValue(_curency, null)?.ToString()!);
                 }
-                currencyData.Add(new MYR() { name = _strings[0], symbol = _strings[1] });
+                currencyData.Add(new CurrencyRecord() { code = property.Name , name = _strings[0], symbol = _strings[1] });
                 _strings.Clear();
             }
         }
 
         var currencyDataSorted = currencyData?
-            .Select(x => $"{x.name} ({x.symbol})")
+            .Select(x => $"{x.code} {x.name} ({x.symbol})")
             .ToList();
         var currencies = string.Join(",\n", currencyDataSorted!);
 
@@ -150,6 +150,21 @@ public class CountriesList
         {
             return "None";
         }
+    }
+
+    public string getContinents(AllCountries allCountries)
+    {
+        if (allCountries.continents != null)
+        {
+            return String.Join(", ", allCountries?.continents!);
+        }else
+        { return "None"; }  
+    }
+
+    public string getDemonyms(AllCountries allCountries)
+    {
+        var demonyms = $"{allCountries?.demonyms?.eng?.m} (M) {allCountries?.demonyms?.eng?.f} (F)";
+        return demonyms;
     }
 
     public string getJsonFileDate(string filePath)
@@ -201,5 +216,12 @@ public class CountriesList
         }
 
     }
+}
+
+public record CurrencyRecord
+{    
+    public string? code { get; set; }
+    public string? name { get; set; }
+    public string? symbol { get; set; }
 }
 
