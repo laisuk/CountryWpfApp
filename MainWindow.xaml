@@ -44,7 +44,7 @@
             <Button x:Name="btnGetInfo" Grid.Column="3" Content="Get Info" Width="100" Height="25" HorizontalAlignment="Right" Margin="0,5,15,5" VerticalAlignment="Center" FontWeight="Bold" FontSize="16" Click="btnGetInfo_Click"/>
         </Grid>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="Country Infomation" Grid.ColumnSpan="2" 
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="COUNTRY INFOMATION" Grid.ColumnSpan="2" 
                    HorizontalAlignment="Left" VerticalAlignment="Center" 
                    FontSize="22" FontWeight="Bold" Margin="20,0,0,0"></TextBlock>
 

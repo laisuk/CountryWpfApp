@@ -32,8 +32,9 @@ namespace CountryWpfApp
             //string message = $"{cbCountryCode.SelectedIndex}: [{cbCountryCode.SelectedItem}] selected.";
             //string title = "Country Selected";
             //MessageBox.Show(message, title);
-            var currentCountry = countryList.getCurrentCountry(allCountryData, cbCountryCode.SelectedIndex);
-            fillCountryForm(currentCountry);
+            //var currentCountry = countryList.getCurrentCountry(allCountryData, cbCountryCode.SelectedIndex);
+            //fillCountryForm(currentCountry);
+            return;
         }
 
         private void btnGetInfo_Click(object sender, RoutedEventArgs e)
@@ -53,7 +54,8 @@ namespace CountryWpfApp
                 tbRegion.Text = countryModel?.region;
                 tbSubRegion.Text = countryModel?.subregion;
 
-                tbLanguages.Text = countryList.getLanguagesMod(countryModel!);
+                tbLanguages.Text = countryList.getLanguages(countryModel!);
+                //tbLanguages.Text = countryList.getLanguagesMod(countryModel!);
 
                 tbArea.Text = countryModel?.area + " km²";
                 tbLatLng.Text = $"{countryModel?.latlng?[0]}° : {countryModel?.latlng?[1]}°";
@@ -67,9 +69,9 @@ namespace CountryWpfApp
                 tbDemonyms.Text = countryList.getDemonyms(countryModel!);
                 tbStartOfWeek.Text = countryModel?.startOfWeek?.ToUpper();
 
-                //string currencies = countryList.getCurrencies(allCountryData[cbCountryCode.SelectedIndex]);
+                string currencies = countryList.getCurrencies(allCountryData[cbCountryCode.SelectedIndex]);
                 //string currencies = countryList.getCurrenciesMod(allCountryData[cbCountryCode.SelectedIndex]);
-                string currencies = countryList.getCurrenciesModified(allCountryData[cbCountryCode.SelectedIndex]);
+                //string currencies = countryList.getCurrenciesModified(allCountryData[cbCountryCode.SelectedIndex]);
                 tbCurrency.Text = currencies;
 
                 Uri uri = new Uri(countryModel?.flags?.png!);
