@@ -45,27 +45,28 @@ public class CountriesList
 
     public string getCurrencies(AllCountries allCountries)
     {
-        if (allCountries.currencies == null)
-        {
-            return "None";
-        }
+        if (allCountries.currencies == null) { return "None"; }
 
         List<string> jsonMatchedList = new List<string>();
 
         var jsonAllCurency = JsonSerializer.Serialize(allCountries.currencies);
-        //var jsonCurrencyMatched = Regex.Matches(jsonAllCurency, "\\{\\\"name\\\":\\\"([\\w\\W]*?)\\\",\\\"symbol\\\":\\\"(.*?)\\\"\\}").ToList();
-        var jsonCurrencyMatched = Regex.Matches(jsonAllCurency, "\\\"[\\w]{3}\\\":\\{\\\"name\\\":\\\"[\\w\\W]*?\\\",\\\"symbol\\\":\\\".*?\\\"\\}").ToList();
+
+        string regTakeCurrencyPattern = "\\\"[\\w]{3}\\\":\\{\\\"name\\\":\\\"[\\w\\W]+?\\\"(,\\\"symbol\\\":\\\".*?\\\")?}";
+        string regAddCodeFindPattern = "^(\\\"[\\w]{3}\\\"):\\{";
+        string regAddCodeReplacePattern = "{\"code\":$1,";
+
+        var jsonCurrencyMatched = Regex.Matches(jsonAllCurency, regTakeCurrencyPattern).ToList();
+
         foreach (var _matche in jsonCurrencyMatched)
         {
-            var _matcheString = Regex.Replace(_matche.ToString(), "^(\\\"[\\w]{3}\\\"):\\{", "{\"code\":$1,");
+            var _matcheString = Regex.Replace(_matche.ToString(), regAddCodeFindPattern, regAddCodeReplacePattern);
             jsonMatchedList.Add(_matcheString);
         }
 
-        //var jsonCurrencyText = "[" + string.Join(",", jsonCurrencyMatched) + "]";
         var jsonCurrencyText = "[" + string.Join(",", jsonMatchedList) + "]";
         var currencyData = JsonSerializer.Deserialize<List<CurrencyRecord>>(jsonCurrencyText!);
         var currencyDataSorted = currencyData?
-            .Select(x => $"{x.code} {x.name} ({x.symbol})")
+            .Select(x => $"{x.code} {x.name} ({(x.symbol == null? "None" : x.symbol)})")
             .ToList();
         var currencies = string.Join(",\n", currencyDataSorted!);
 
@@ -75,15 +76,13 @@ public class CountriesList
 
     public string getCurrenciesMod(AllCountries allCountries)
     {
-        if (allCountries.currencies == null)
-        {
-            return "None";
-        }
+        if (allCountries.currencies == null) { return "None"; }
 
         List<string> currencyList = new List<string>();
         PropertyInfo[] propertyInfo = typeof(Currencies).GetProperties();
         foreach (PropertyInfo property in propertyInfo)
         {
+            if(!property.CanRead) continue;
             var _currency = property.GetValue(allCountries.currencies, null);
             if (_currency != null)
             {
@@ -95,7 +94,7 @@ public class CountriesList
         var jsonCurrencyText = "[" + string.Join(",", currencyList) + "]";
         var currencyData = JsonSerializer.Deserialize<List<CurrencyRecord>>(jsonCurrencyText!);
         var currencyDataSorted = currencyData?
-            .Select(x => $"{x.code} {x.name} ({x.symbol})")
+            .Select(x => $"{x.code} {x.name} ({(x.symbol==null? "None" : x.symbol)})")
             .ToList();
         var currencies = string.Join(",\n", currencyDataSorted!);
 
@@ -104,10 +103,7 @@ public class CountriesList
 
     public string getCurrenciesModified(AllCountries allCountries)
     {
-        if (allCountries.currencies == null)
-        {
-            return "None";
-        }
+        if (allCountries.currencies == null) { return "None"; }
 
         List<CurrencyRecord> currencyData = new List<CurrencyRecord>();
         List<string> _strings = new List<string>();
@@ -121,9 +117,17 @@ public class CountriesList
             {
                 foreach (PropertyInfo property1 in _currency.GetType().GetProperties())
                 {
+                    if(!property1.CanRead) continue;
                     _strings.Add(property1.GetValue(_currency, null)?.ToString()!);
                 }
-                currencyData.Add(new CurrencyRecord() { code = property.Name, name = _strings[0], symbol = _strings[1] });
+                if(_strings.Count == 2)
+                {
+                    currencyData.Add(new CurrencyRecord() { code = property.Name, name = _strings[0], symbol = _strings[1] });
+                }
+                else
+                {
+                    currencyData.Add(new CurrencyRecord() { code = property.Name, name = _strings[0], symbol = "None" });
+                }                
                 _strings.Clear();
             }
         }
