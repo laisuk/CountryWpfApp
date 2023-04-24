@@ -13,18 +13,20 @@ namespace CountryWpfApp
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static string countryFilePath = @".\Data\all.json";
-        public static CountriesList countryList = new();
-        List<AllCountries> allCountryData = countryList.getAllCountryData(countryFilePath);
+        private const string V = @".\Data\all.json";
+        public static string countryFilePath = V;
+        private static readonly CountriesList countriesList = new();
+        public static CountriesList countryList = countriesList;
+        List<AllCountries> allCountryData = CountriesList.GetAllCountryData(countryFilePath);
 
         public MainWindow()
         {
             InitializeComponent();
 
-            var countryNameList = countryList.getAllCountryList(allCountryData);
+            var countryNameList = CountriesList.GetAllCountryList(allCountryData);
             cbCountryCode.ItemsSource = countryNameList;
             cbCountryCode.SelectedIndex = -1;
-            lblFileDate.Content = countryList.getJsonFileDate(countryFilePath);
+            lblFileDate.Content = CountriesList.GetJsonFileDate(countryFilePath);
         }
 
         private void cbCountryCode_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
@@ -39,7 +41,7 @@ namespace CountryWpfApp
 
         private void btnGetInfo_Click(object sender, RoutedEventArgs e)
         {
-            var currentCountry = countryList.getCurrentCountry(allCountryData, cbCountryCode.SelectedIndex);
+            var currentCountry = CountriesList.GetCurrentCountry(allCountryData, cbCountryCode.SelectedIndex);
             fillCountryForm(currentCountry);
         }
 
@@ -54,31 +56,30 @@ namespace CountryWpfApp
                 tbRegion.Text = countryModel?.region;
                 tbSubRegion.Text = countryModel?.subregion;
 
-                tbLanguages.Text = countryList.getLanguages(countryModel!);
+                tbLanguages.Text = CountriesList.GetLanguages(countryModel!);
                 //tbLanguages.Text = countryList.getLanguagesMod(countryModel!);
 
                 tbArea.Text = countryModel?.area + " km²";
                 tbLatLng.Text = $"{countryModel?.latlng?[0]}° : {countryModel?.latlng?[1]}°";
                 tbPopulation.Text = countryModel?.population.ToString();
 
-                tbBorder.Text = countryList.getBorders(countryModel!);
+                tbBorder.Text = CountriesList.GetBorders(countryModel!);
 
                 tbCar.Text = countryModel?.car?.side?.ToUpper();
                 tbTimeZone.Text = countryModel?.timezones?[0];
-                tbContinent.Text = countryList.getContinents(countryModel!);
-                tbDemonyms.Text = countryList.getDemonyms(countryModel!);
+                tbContinent.Text = CountriesList.GetContinents(countryModel!);
+                tbDemonyms.Text = CountriesList.GetDemonyms(countryModel!);
                 tbStartOfWeek.Text = countryModel?.startOfWeek?.ToUpper();
 
                 //string currencies = countryList.getCurrencies(allCountryData[cbCountryCode.SelectedIndex]); // Regex
-                string currencies = countryList.getCurrenciesRx(allCountryData[cbCountryCode.SelectedIndex]); // Regex + Serialized IgnoreNull
+                string currencies = CountriesList.GetCurrenciesRx(allCountryData[cbCountryCode.SelectedIndex]); // Regex + Serialized IgnoreNull
                 //string currencies = countryList.getCurrenciesMod(allCountryData[cbCountryCode.SelectedIndex]); // Hybrid Reflection + Serialized
                 //string currencies = countryList.getCurrenciesModified(allCountryData[cbCountryCode.SelectedIndex]); // Reflection
                 tbCurrency.Text = currencies;
 
-                Uri uri = new Uri(countryModel?.flags?.png!);
+                Uri uri = new(countryModel?.flags?.png!);
                 imgFlag.Source = new BitmapImage(uri);
                 imgFlag.ToolTip = countryModel?.flags?.alt!;
-
             }
         }
 
@@ -89,8 +90,7 @@ namespace CountryWpfApp
 
         private void btnUpdateData_Click(object sender, RoutedEventArgs e)
         {
-            countryList.updateJsonDataFile(countryFilePath);
-
+            CountriesList.UpdateJsonDataFile(countryFilePath);
             var length = 100;
 
             Task.Run(() =>
@@ -106,12 +106,11 @@ namespace CountryWpfApp
 
                 Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    lblFileDate.Content = countryList.getJsonFileDate(countryFilePath);
+                    lblFileDate.Content = CountriesList.GetJsonFileDate(countryFilePath);
                 }), DispatcherPriority.Render);
             });
 
-            allCountryData = countryList.getAllCountryData(countryFilePath);
-
+            allCountryData = CountriesList.GetAllCountryData(countryFilePath);
         }
     }
 }

@@ -9,10 +9,9 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Text.Json.Serialization;
 
-public class CountriesList
+public partial class CountriesList
 {
-
-    public List<AllCountries> getAllCountryData(string filePath)
+    public static List<AllCountries> GetAllCountryData(string filePath)
     {
         try
         {
@@ -22,13 +21,13 @@ public class CountriesList
 
             return query.ToList();
         }
-        catch (System.Exception)
+        catch (Exception)
         {
             throw;
         }
     }
 
-    public List<string> getAllCountryList(List<AllCountries> allCountries)
+    public static List<string> GetAllCountryList(List<AllCountries> allCountries)
     {
         var allCountryList = allCountries
             .Select(x => x.name?.common)
@@ -37,16 +36,16 @@ public class CountriesList
         return allCountryList!;
     }
 
-    public AllCountries getCurrentCountry(List<AllCountries> allCountries, int id)
+    public static AllCountries GetCurrentCountry(List<AllCountries> allCountries, int id)
     {
         return allCountries[id];
     }
 
-    public string getCurrencies(AllCountries allCountries)
+    public static string GetCurrencies(AllCountries allCountries)
     {
         if (allCountries.currencies == null) { return "N/A"; }
 
-        List<string> jsonMatchedList = new List<string>();
+        List<string> jsonMatchedList = new();
 
         var jsonOptions = new JsonSerializerOptions() { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
         var jsonAllCurrency = JsonSerializer.Serialize(allCountries.currencies, jsonOptions);
@@ -57,16 +56,16 @@ public class CountriesList
 
         var jsonCurrencyMatched = Regex.Matches(jsonAllCurrency, rxExtractCurrencyPattern).ToList();
 
-        foreach (var _matche in jsonCurrencyMatched)
+        foreach (var _matched in jsonCurrencyMatched)
         {
-            var _matcheString = Regex.Replace(_matche.ToString(), rxAddCodeFindPattern, rxAddCodeReplacePattern);
-            jsonMatchedList.Add(_matcheString);
+            var _matchedString = Regex.Replace(_matched.ToString(), rxAddCodeFindPattern, rxAddCodeReplacePattern);
+            jsonMatchedList.Add(_matchedString);
         }
 
         var jsonCurrencyText = $"[{string.Join(",", jsonMatchedList)}]";
         var currencyData = JsonSerializer.Deserialize<List<CurrencyRecord>>(jsonCurrencyText!);
         var currencyDataSorted = currencyData?
-            .Select(x => $"{x.code} {x.name} ({(x.symbol == null ? "N/A" : x.symbol)})")
+            .Select(x => $"{x.code} {x.name} ({x.symbol ?? "N/A"})")
             .ToList();
         var currencies = string.Join(",\n", currencyDataSorted!);
 
@@ -74,7 +73,7 @@ public class CountriesList
         //return jsonAllCurrency;
     }
 
-    public string getCurrenciesRx(AllCountries allCountries)
+    public static string GetCurrenciesRx(AllCountries allCountries)
     {
         if (allCountries.currencies == null) { return "N/A"; }
 
@@ -89,7 +88,7 @@ public class CountriesList
 
         var currencyData = JsonSerializer.Deserialize<List<CurrencyRecord>>(jsonAllCurrencyText!);
         var currencyDataSorted = currencyData?
-            .Select(x => $"{x.code} {x.name} ({(x.symbol == null ? "N/A" : x.symbol)})")
+            .Select(x => $"{x.code} {x.name} ({(x.symbol ?? "N/A")})")
             .ToList();
         var currencies = string.Join(",\n", currencyDataSorted!);
 
@@ -97,11 +96,11 @@ public class CountriesList
         //return jsonAllCurrency;
     }
 
-    public string getCurrenciesMod(AllCountries allCountries)
+    public static string GetCurrenciesMod(AllCountries allCountries)
     {
         if (allCountries.currencies == null) { return "N/A"; }
 
-        List<string> currencyList = new List<string>();
+        List<string> currencyList = new();
         PropertyInfo[] propertyInfo = typeof(Currencies).GetProperties();
         foreach (PropertyInfo property in propertyInfo)
         {
@@ -110,21 +109,21 @@ public class CountriesList
             if (_currency != null)
             {
                 string _jsonCurrency = JsonSerializer.Serialize(_currency, property.PropertyType);
-                var _tmp = Regex.Replace(_jsonCurrency, @"^(\{)", $"$1\"code\":\"{property.Name}\",");
+                var _tmp = RegexReplacePropertyName().Replace(_jsonCurrency, $"$1\"code\":\"{property.Name}\",");
                 currencyList.Add(_tmp);
             }
         }
         var jsonCurrencyText = $"[{string.Join(",", currencyList)}]";
         var currencyData = JsonSerializer.Deserialize<List<CurrencyRecord>>(jsonCurrencyText!);
         var currencyDataSorted = currencyData?
-            .Select(x => $"{x.code} {x.name} ({(x.symbol == null ? "N/A" : x.symbol)})")
+            .Select(x => $"{x.code} {x.name} ({(x.symbol ?? "N/A")})")
             .ToList();
         var currencies = string.Join(",\n", currencyDataSorted!);
 
         return currencies;
     }
 
-    public string getCurrenciesModified(AllCountries allCountries)
+    public static string GetCurrenciesModified(AllCountries allCountries)
     {
         if (allCountries.currencies == null)
         {
@@ -132,7 +131,7 @@ public class CountriesList
         }
 
         List<CurrencyRecord> currencyData = new List<CurrencyRecord>();
-        List<string> _strings = new List<string>();
+        List<string> _strings = new();
 
         PropertyInfo[] propertyInfo = typeof(Currencies).GetProperties();
 
@@ -167,24 +166,24 @@ public class CountriesList
         return currencies;
     }
 
-    public string getLanguages(AllCountries allCountries)
+    public static string GetLanguages(AllCountries allCountries)
     {
         if (allCountries.languages == null) { return "N/A"; }
 
         var jsonOptions = new JsonSerializerOptions() { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
         var languages = JsonSerializer.Serialize(allCountries.languages, jsonOptions);
-        var countryLanguage = Regex.Matches(languages, "(?<=:\\\")\\w*(?=\\\")")
+        var countryLanguage = RegexGetLanguage().Matches(languages)
             .ToList();
         var languageList = string.Join(", ", countryLanguage);
 
         return languageList;
     }
 
-    public string getLanguagesMod(AllCountries allCountries)
+    public static string GetLanguagesMod(AllCountries allCountries)
     {
         if (allCountries.languages == null) { return "N/A"; }
 
-        List<string> languagesMod = new List<string>();
+        List<string> languagesMod = new();
         PropertyInfo[] properties = typeof(Languages).GetProperties();
 
         if (properties.Length == 0) { return "N/A"; }
@@ -192,11 +191,11 @@ public class CountriesList
         foreach (PropertyInfo property in properties)
         {
             if (!property.CanRead) continue;
-            var _languege = property.GetValue(allCountries?.languages!, null);
+            var _language = property.GetValue(allCountries?.languages!, null);
 
-            if (_languege != null)
+            if (_language != null)
             {
-                languagesMod.Add(_languege.ToString()!);
+                languagesMod.Add(_language.ToString()!);
             }
         }
 
@@ -205,39 +204,39 @@ public class CountriesList
         return languageList;
     }
 
-    public string getBorders(AllCountries allCountries)
+    public static string GetBorders(AllCountries allCountries)
     {
         if (allCountries?.borders != null)
         {
-            return String.Join(", ", allCountries?.borders!);
+            return string.Join(", ", allCountries?.borders!);
         }
         else
         { return "None"; }
     }
 
-    public string getContinents(AllCountries allCountries)
+    public static string GetContinents(AllCountries allCountries)
     {
         if (allCountries.continents != null)
         {
-            return String.Join(", ", allCountries?.continents!);
+            return string.Join(", ", allCountries?.continents!);
         }
         else
         { return "None"; }
     }
 
-    public string getDemonyms(AllCountries allCountries)
+    public static string GetDemonyms(AllCountries allCountries)
     {
         var demonyms = $"{allCountries?.demonyms?.eng?.m} (M)\n{allCountries?.demonyms?.eng?.f} (F)";
         return demonyms;
     }
 
-    public string getJsonFileDate(string filePath)
+    public static string GetJsonFileDate(string filePath)
     {
         //return File.GetCreationTime(filePath).ToString();
         return File.GetLastWriteTime(filePath).ToString();
     }
 
-    public async void updateJsonDataFile(string filePath)
+    public static async void UpdateJsonDataFile(string filePath)
     {
         string allCountryUrl = @"https://restcountries.com/v3.1/all";
         string backupFilePath = @".\Data\all.json.bak";
@@ -247,38 +246,41 @@ public class CountriesList
             try
             {
                 File.Copy(filePath, backupFilePath, true);
-                //string sucessMassage = $"File backup done: {backupFilePath} @ " + getJsonFileDate(backupFilePath);
-                //MessageBox.Show(sucessMassage, "File Backup");
+                //string successMassage = $"File backup done: {backupFilePath} @ " + getJsonFileDate(backupFilePath);
+                //MessageBox.Show(successMassage, "File Backup");
             }
             catch (Exception ex)
             {
                 string errorMassage = "File backup error: " + ex.Message;
-                MessageBox.Show(errorMassage, getJsonFileDate(filePath));
+                MessageBox.Show(errorMassage, GetJsonFileDate(filePath));
 
                 throw;
             }
         }
 
-        using (var client = new HttpClient())
+        using var client = new HttpClient();
+        var response = await client.GetAsync(allCountryUrl);
+        var content = await response.Content.ReadAsStringAsync();
+
+        try
         {
-            var response = await client.GetAsync(allCountryUrl);
-            var content = await response.Content.ReadAsStringAsync();
+            File.WriteAllText(filePath, content);
+            string successMassage = $"File update SUCCESS: {filePath} @ " + GetJsonFileDate(filePath);
+            MessageBox.Show(successMassage, "JSON Data File Update");
+        }
+        catch (Exception ex)
+        {
+            string errorMassage = "File update error: " + ex.Message;
+            MessageBox.Show(errorMassage, GetJsonFileDate(filePath));
 
-            try
-            {
-                File.WriteAllText(filePath, content);
-                string sucessMassage = $"File update SUCCESS: {filePath} @ " + getJsonFileDate(filePath);
-                MessageBox.Show(sucessMassage, "JSON Data File Update");
-            }
-            catch (Exception ex)
-            {
-                string errorMassage = "File update error: " + ex.Message;
-                MessageBox.Show(errorMassage, getJsonFileDate(filePath));
-
-                throw;
-            }
+            throw;
         }
     }
+
+    [GeneratedRegex("^(\\{)")]
+    private static partial Regex RegexReplacePropertyName();
+    [GeneratedRegex("(?<=:\\\")\\w*(?=\\\")")]
+    private static partial Regex RegexGetLanguage();
 }
 
 public record CurrencyRecord
