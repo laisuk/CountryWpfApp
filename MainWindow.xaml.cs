@@ -69,9 +69,10 @@ namespace CountryWpfApp
                 tbDemonyms.Text = countryList.getDemonyms(countryModel!);
                 tbStartOfWeek.Text = countryModel?.startOfWeek?.ToUpper();
 
-                string currencies = countryList.getCurrencies(allCountryData[cbCountryCode.SelectedIndex]);
-                //string currencies = countryList.getCurrenciesMod(allCountryData[cbCountryCode.SelectedIndex]);
-                //string currencies = countryList.getCurrenciesModified(allCountryData[cbCountryCode.SelectedIndex]);
+                //string currencies = countryList.getCurrencies(allCountryData[cbCountryCode.SelectedIndex]); // Regex
+                string currencies = countryList.getCurrenciesRx(allCountryData[cbCountryCode.SelectedIndex]); // Regex + Serialized IgnoreNull
+                //string currencies = countryList.getCurrenciesMod(allCountryData[cbCountryCode.SelectedIndex]); // Hybrid Reflection + Serialized
+                //string currencies = countryList.getCurrenciesModified(allCountryData[cbCountryCode.SelectedIndex]); // Reflection
                 tbCurrency.Text = currencies;
 
                 Uri uri = new Uri(countryModel?.flags?.png!);
