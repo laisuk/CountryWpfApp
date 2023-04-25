@@ -112,8 +112,13 @@ namespace CountryWpfApp
                         }), DispatcherPriority.Render);
                         break;
                     }
-                    Thread.Sleep(20);
+                    Thread.Sleep(30);
                 }
+                Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    lblFileDate.Content = CountriesList.GetJsonFileDate(countryFilePath);
+                }), DispatcherPriority.Render);
+                updateComplete = V2;
             });
 
             allCountryData = CountriesList.GetAllCountryData(countryFilePath);
