@@ -265,6 +265,7 @@ public partial class CountriesList
         try
         {
             File.WriteAllText(filePath, content);
+            CountryWpfApp.MainWindow.updateComplete = true;
             string successMassage = $"File update SUCCESS: {filePath} @ " + GetJsonFileDate(filePath);
             MessageBox.Show(successMassage, "JSON Data File Update");
         }

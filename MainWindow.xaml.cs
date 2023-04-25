@@ -13,11 +13,13 @@ namespace CountryWpfApp
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const string V = @".\Data\all.json";
-        public static string countryFilePath = V;
+        private const string V1 = @".\Data\all.json";
+        private const bool V2 = false;
+        public static string countryFilePath = V1;
         private static readonly CountriesList countriesList = new();
         public static CountriesList countryList = countriesList;
         List<AllCountries> allCountryData = CountriesList.GetAllCountryData(countryFilePath);
+        public static bool updateComplete;
 
         public MainWindow()
         {
@@ -90,6 +92,7 @@ namespace CountryWpfApp
 
         private void btnUpdateData_Click(object sender, RoutedEventArgs e)
         {
+            updateComplete = V2;
             CountriesList.UpdateJsonDataFile(countryFilePath);
             var length = 100;
 
@@ -101,13 +104,16 @@ namespace CountryWpfApp
                     {
                         lblFileDate.Content = $"Updating...({i})";
                     }), DispatcherPriority.Render);
+                    if (updateComplete)
+                    {
+                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            lblFileDate.Content = CountriesList.GetJsonFileDate(countryFilePath);
+                        }), DispatcherPriority.Render);
+                        break;
+                    }
                     Thread.Sleep(20);
                 }
-
-                Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    lblFileDate.Content = CountriesList.GetJsonFileDate(countryFilePath);
-                }), DispatcherPriority.Render);
             });
 
             allCountryData = CountriesList.GetAllCountryData(countryFilePath);
