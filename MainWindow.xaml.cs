@@ -102,14 +102,12 @@ namespace CountryWpfApp
                 {
                     Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                     {
+                        btnUpdateData.IsEnabled = false;
                         lblFileDate.Content = $"Updating...({i})";
                     }), DispatcherPriority.Render);
+
                     if (updateComplete)
                     {
-                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            lblFileDate.Content = CountriesList.GetJsonFileDate(countryFilePath);
-                        }), DispatcherPriority.Render);
                         break;
                     }
                     Thread.Sleep(30);
@@ -117,11 +115,13 @@ namespace CountryWpfApp
                 Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     lblFileDate.Content = CountriesList.GetJsonFileDate(countryFilePath);
+                    btnUpdateData.IsEnabled = true;
                 }), DispatcherPriority.Render);
                 updateComplete = V2;
             });
 
             allCountryData = CountriesList.GetAllCountryData(countryFilePath);
+            
         }
     }
 }

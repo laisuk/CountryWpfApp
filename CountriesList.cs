@@ -249,12 +249,12 @@ public partial class CountriesList
                 //string successMassage = $"File backup done: {backupFilePath} @ " + getJsonFileDate(backupFilePath);
                 //MessageBox.Show(successMassage, "File Backup");
             }
-            catch (Exception ex)
+            catch (HttpRequestException e)
             {
-                string errorMassage = "File backup error: " + ex.Message;
+                string errorMassage = "File backup error: " + e.Message;
                 MessageBox.Show(errorMassage, GetJsonFileDate(filePath));
 
-                throw;
+                //throw;
             }
         }
 
@@ -269,12 +269,12 @@ public partial class CountriesList
             string successMassage = $"File update SUCCESS: {filePath} @ " + GetJsonFileDate(filePath);
             MessageBox.Show(successMassage, "JSON Data File Update");
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            string errorMassage = "File update error: " + ex.Message;
+            string errorMassage = "File update error: " + e.Message;
             MessageBox.Show(errorMassage, GetJsonFileDate(filePath));
 
-            throw;
+            //throw;
         }
     }
 
