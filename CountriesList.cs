@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Text.Json.Serialization;
+using CountryWpfApp;
 
 public partial class CountriesList
 {
@@ -27,7 +28,7 @@ public partial class CountriesList
         }
     }
 
-    public static List<string> GetAllCountryList(List<AllCountries> allCountries)
+    public static List<string> GetAllCountryNameList(List<AllCountries> allCountries)
     {
         var allCountryList = allCountries
             .Select(x => x.name?.common)
@@ -130,7 +131,7 @@ public partial class CountriesList
             return "N/A";
         }
 
-        List<CurrencyRecord> currencyData = new List<CurrencyRecord>();
+        List<CurrencyRecord> currencyData = new();
         List<string> _strings = new();
 
         PropertyInfo[] propertyInfo = typeof(Currencies).GetProperties();
@@ -238,8 +239,8 @@ public partial class CountriesList
 
     public static async void UpdateJsonDataFile(string filePath)
     {
-        string allCountryUrl = @"https://restcountries.com/v3.1/all";
-        string backupFilePath = @".\Data\all.json.bak";
+        string allCountryUrl = MainWindow.AllCountryUrl;
+        string backupFilePath = MainWindow.JsonBackupFilePath;
 
         if (File.Exists(filePath))
         {
@@ -265,7 +266,7 @@ public partial class CountriesList
         try
         {
             File.WriteAllText(filePath, content);
-            CountryWpfApp.MainWindow.updateComplete = true;
+            MainWindow.updateComplete = true;
             string successMassage = $"File update SUCCESS: {filePath} @ " + GetJsonFileDate(filePath);
             MessageBox.Show(successMassage, "JSON Data File Update");
         }
