@@ -42,6 +42,7 @@ public partial class CountriesList
         return allCountries[id];
     }
 
+    // Get currency with Regex
     public static string GetCurrencies(AllCountries allCountries)
     {
         if (allCountries.currencies == null) { return "N/A"; }
@@ -74,6 +75,7 @@ public partial class CountriesList
         //return jsonAllCurrency;
     }
 
+    // Regex + Serialized IgnoreNull
     public static string GetCurrenciesRx(AllCountries allCountries)
     {
         if (allCountries.currencies == null) { return "N/A"; }
@@ -97,6 +99,7 @@ public partial class CountriesList
         //return jsonAllCurrency;
     }
 
+    // Hybrid Reflection + Serialized
     public static string GetCurrenciesMod(AllCountries allCountries)
     {
         if (allCountries.currencies == null) { return "N/A"; }
@@ -124,6 +127,7 @@ public partial class CountriesList
         return currencies;
     }
 
+    // Reflection
     public static string GetCurrenciesModified(AllCountries allCountries)
     {
         if (allCountries.currencies == null)
@@ -134,9 +138,7 @@ public partial class CountriesList
         List<CurrencyRecord> currencyData = new();
         List<string> _strings = new();
 
-        PropertyInfo[] propertyInfo = typeof(Currencies).GetProperties();
-
-        foreach (PropertyInfo property in propertyInfo)
+        foreach (PropertyInfo property in allCountries.currencies.GetType().GetProperties())
         {
             if (!property.CanRead) continue;
             var _currency = property.GetValue(allCountries.currencies, null);
@@ -165,6 +167,38 @@ public partial class CountriesList
         var currencies = string.Join(",\n", currencyDataSorted!);
 
         return currencies;
+
+    }
+
+    // Reflection 2
+    public static string GetCurrenciesReflection(AllCountries allCountries)
+    {
+        if (allCountries.currencies == null)
+        {
+            return "N/A";
+        }
+
+        List<CurrencyRecord> currencyData = new();
+
+        foreach (PropertyInfo property in allCountries.currencies.GetType().GetProperties())
+        {
+            if (!property.CanRead) continue;
+            var _currency = property.GetValue(allCountries.currencies, null);
+            if (_currency != null)
+            {
+                var _name = _currency.GetType().GetProperty("name")!.GetValue(_currency, null)!.ToString();
+                var _symbol = _currency.GetType().GetProperty("symbol") != null ? _currency.GetType().GetProperty("symbol")!.GetValue(_currency, null)!.ToString() : "N/A";
+                currencyData.Add(new CurrencyRecord() { code = property.Name, name = _name, symbol = _symbol });
+            }
+        }
+
+        var currencyDataSorted = currencyData?
+            .Select(x => $"{x.code} {x.name} ({x.symbol})")
+            .ToList();
+        var currencies = string.Join(",\n", currencyDataSorted!);
+
+        return currencies;
+
     }
 
     public static string GetLanguages(AllCountries allCountries)
@@ -185,9 +219,10 @@ public partial class CountriesList
         if (allCountries.languages == null) { return "N/A"; }
 
         List<string> languagesMod = new();
-        PropertyInfo[] properties = typeof(Languages).GetProperties();
+        //PropertyInfo[] properties = typeof(Languages).GetProperties();
+        PropertyInfo[] properties = allCountries.languages.GetType().GetProperties();
 
-        if (properties.Length == 0) { return "N/A"; }
+        //if (properties.Length == 0) { return "N/A"; }
 
         foreach (PropertyInfo property in properties)
         {

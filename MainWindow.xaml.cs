@@ -56,8 +56,8 @@ namespace CountryWpfApp
                 tbRegion.Text = countryModel?.region;
                 tbSubRegion.Text = countryModel?.subregion;
 
-                tbLanguages.Text = CountriesList.GetLanguages(countryModel!);
-                //tbLanguages.Text = countryList.getLanguagesMod(countryModel!);
+                //tbLanguages.Text = CountriesList.GetLanguages(countryModel!);
+                tbLanguages.Text = CountriesList.GetLanguagesMod(countryModel!);
 
                 tbArea.Text = countryModel?.area + " km²";
                 tbLatLng.Text = $"{countryModel?.latlng?[0]}° : {countryModel?.latlng?[1]}°";
@@ -71,10 +71,11 @@ namespace CountryWpfApp
                 tbDemonyms.Text = CountriesList.GetDemonyms(countryModel!);
                 tbStartOfWeek.Text = countryModel?.startOfWeek?.ToUpper();
 
-                //string currencies = countryList.getCurrencies(allCountryData[cbCountryCode.SelectedIndex]); // Regex
-                string currencies = CountriesList.GetCurrenciesRx(AllCountryData[cbCountryCode.SelectedIndex]); // Regex + Serialized IgnoreNull
-                //string currencies = countryList.getCurrenciesMod(allCountryData[cbCountryCode.SelectedIndex]); // Hybrid Reflection + Serialized
-                //string currencies = countryList.getCurrenciesModified(allCountryData[cbCountryCode.SelectedIndex]); // Reflection
+                //string currencies = CountriesList.GetCurrencies(countryModel!); // Regex
+                //string currencies = CountriesList.GetCurrenciesRx(countryModel!); // Regex + Serialized IgnoreNull
+                //string currencies = CountriesList.GetCurrenciesMod(countryModel!); // Hybrid Reflection + Serialized
+                //string currencies = CountriesList.GetCurrenciesModified(countryModel!); // Reflection
+                string currencies = CountriesList.GetCurrenciesReflection(countryModel!); // Reflection 2
                 tbCurrency.Text = currencies;
 
                 Uri uri = new(countryModel?.flags?.png!);
