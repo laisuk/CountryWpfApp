@@ -15,18 +15,19 @@ namespace CountryWpfApp
     {
         public const string countryFilePath = @".\Data\all.json";
         public const string AllCountryUrl = @"https://restcountries.com/v3.1/all";
-        public const string JsonBackupFilePath = @".\Data\all.json.bak";
+        public const string JsonBackupFilePath = @".\Data\all.json.bak";        
         private static List<AllCountries> AllCountryData = CountriesList.GetAllCountryData(countryFilePath);
-        public static bool updateComplete;        
+        public static bool updateComplete;
 
         public MainWindow()
         {
             InitializeComponent();
-
             var countryNameList = CountriesList.GetAllCountryNameList(AllCountryData);
             cbCountryCode.ItemsSource = countryNameList;
             cbCountryCode.SelectedIndex = -1;
             lblFileDate.Content = CountriesList.GetJsonFileDate(countryFilePath);
+
+
         }
 
         private void cbCountryCode_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
@@ -56,8 +57,8 @@ namespace CountryWpfApp
                 tbRegion.Text = countryModel?.region;
                 tbSubRegion.Text = countryModel?.subregion;
 
-                //tbLanguages.Text = CountriesList.GetLanguages(countryModel!);
-                tbLanguages.Text = CountriesList.GetLanguagesMod(countryModel!);
+                tbLanguages.Text = CountriesList.GetLanguages(countryModel!);
+                //tbLanguages.Text = CountriesList.GetLanguagesMod(countryModel!);
 
                 tbArea.Text = countryModel?.area + " km²";
                 tbLatLng.Text = $"{countryModel?.latlng?[0]}° : {countryModel?.latlng?[1]}°";
@@ -72,10 +73,10 @@ namespace CountryWpfApp
                 tbStartOfWeek.Text = countryModel?.startOfWeek?.ToUpper();
 
                 //string currencies = CountriesList.GetCurrencies(countryModel!); // Regex
-                //string currencies = CountriesList.GetCurrenciesRx(countryModel!); // Regex + Serialized IgnoreNull
+                string currencies = CountriesList.GetCurrenciesRx(countryModel!); // Regex + Serialized IgnoreNull
                 //string currencies = CountriesList.GetCurrenciesMod(countryModel!); // Hybrid Reflection + Serialized
                 //string currencies = CountriesList.GetCurrenciesModified(countryModel!); // Reflection
-                string currencies = CountriesList.GetCurrenciesReflection(countryModel!); // Reflection 2
+                //string currencies = CountriesList.GetCurrenciesReflection(countryModel!); // Reflection 2
                 tbCurrency.Text = currencies;
 
                 Uri uri = new(countryModel?.flags?.png!);
@@ -93,7 +94,7 @@ namespace CountryWpfApp
         {
             updateComplete = false;
             CountriesList.UpdateJsonDataFile(countryFilePath);
-            var length = 100;
+            var length = 500;
 
             Task.Run(() =>
             {
@@ -109,7 +110,7 @@ namespace CountryWpfApp
                     {
                         break;
                     }
-                    Thread.Sleep(30);
+                    Thread.Sleep(100);
                 }
                 Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                 {
@@ -118,8 +119,7 @@ namespace CountryWpfApp
                 }), DispatcherPriority.Render);
                 updateComplete = false;
             });
-
-            AllCountryData = CountriesList.GetAllCountryData(countryFilePath);            
+            
         }
     }
 }

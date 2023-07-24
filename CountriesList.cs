@@ -9,16 +9,22 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Text.Json.Serialization;
 using CountryWpfApp;
+using CountryWpfApp.Models;
 
 public partial class CountriesList
-{
+{  
     public static List<AllCountries> GetAllCountryData(string filePath)
     {
+        if (!File.Exists(filePath))
+        {
+            File.WriteAllText(filePath, MyModel.my);
+        }
+
         try
         {
             var jsonText = File.ReadAllText(filePath);
             var countryData = JsonSerializer.Deserialize<List<AllCountries>>(jsonText);
-            IEnumerable<AllCountries> query = countryData!.OrderBy(AllCountries => AllCountries?.name?.common);
+            IEnumerable<AllCountries> query = countryData!.OrderBy(x => x?.name?.common);
 
             return query.ToList();
         }
@@ -26,6 +32,7 @@ public partial class CountriesList
         {
             throw;
         }
+
     }
 
     public static List<string> GetAllCountryNameList(List<AllCountries> allCountries)
@@ -292,10 +299,10 @@ public partial class CountriesList
 
                 //throw;
             }
-        }
+        }       
 
         using var client = new HttpClient();
-        var response = await client.GetAsync(allCountryUrl);
+        HttpResponseMessage response = await client.GetAsync(allCountryUrl);
         var content = await response.Content.ReadAsStringAsync();
 
         try
