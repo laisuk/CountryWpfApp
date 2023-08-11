@@ -10,9 +10,11 @@ using System.Windows;
 using System.Text.Json.Serialization;
 using CountryWpfApp;
 using CountryWpfApp.Models;
+using System.Text.Json.Nodes;
+using System.Collections;
 
 public partial class CountriesList
-{  
+{
     public static List<AllCountries> GetAllCountryData(string filePath)
     {
         if (!File.Exists(filePath))
@@ -99,6 +101,35 @@ public partial class CountriesList
         var currencyData = JsonSerializer.Deserialize<List<CurrencyRecord>>(jsonAllCurrencyText!);
         var currencyDataSorted = currencyData?
             .Select(x => $"{x.code} {x.name} ({(x.symbol ?? "N/A")})")
+            .ToList();
+        var currencies = string.Join(",\n", currencyDataSorted!);
+
+        return currencies;
+        //return jsonAllCurrency;
+    }
+
+    public static string GetCurrenciesNodes(Currencies currency)
+    {
+        if (currency == null) { return "N/A"; }
+
+        var jsonOptions = new JsonSerializerOptions() { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
+        var jsonAllCurrency = JsonSerializer.Serialize(currency, jsonOptions);
+
+        if (jsonAllCurrency == null) { return "N/A"; }
+
+        List<CurrencyRecord> currencyData = new();
+
+        IEnumerable<KeyValuePair<string, JsonNode?>> currencyJsonObject = JsonNode.Parse(jsonAllCurrency)!.AsObject().AsEnumerable();
+        foreach (KeyValuePair<string, JsonNode?> key in currencyJsonObject)
+        {
+            var _tmp = JsonNode.Parse(key.Value!.ToString());
+            var _name = _tmp?["name"];
+            var _symbol = _tmp?["symbol"] ?? "N/A";
+            currencyData.Add(new CurrencyRecord() { code = key.Key, name = (string)_name!, symbol = (string)_symbol! });
+        }
+
+        var currencyDataSorted = currencyData?
+            .Select(x => $"{x.code} {x.name} ({x.symbol})")
             .ToList();
         var currencies = string.Join(",\n", currencyDataSorted!);
 
@@ -208,33 +239,30 @@ public partial class CountriesList
 
     }
 
-    public static string GetLanguages(AllCountries allCountries)
+    public static string GetLanguages(Languages languages)
     {
-        if (allCountries.languages == null) { return "N/A"; }
+        if (languages == null) { return "N/A"; }
 
         var jsonOptions = new JsonSerializerOptions() { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
-        var languages = JsonSerializer.Serialize(allCountries.languages, jsonOptions);
-        var countryLanguage = RegexGetLanguage().Matches(languages)
+        var languagesText = JsonSerializer.Serialize(languages, jsonOptions);
+        var countryLanguage = RegexGetLanguage().Matches(languagesText)
             .ToList();
         var languageList = string.Join(", ", countryLanguage);
 
         return languageList;
     }
 
-    public static string GetLanguagesMod(AllCountries allCountries)
+    public static string GetLanguagesMod(Languages languages)
     {
-        if (allCountries.languages == null) { return "N/A"; }
+        if (languages == null) { return "N/A"; }
 
         List<string> languagesMod = new();
-        //PropertyInfo[] properties = typeof(Languages).GetProperties();
-        PropertyInfo[] properties = allCountries.languages.GetType().GetProperties();
-
-        //if (properties.Length == 0) { return "N/A"; }
+        PropertyInfo[] properties = languages.GetType().GetProperties();
 
         foreach (PropertyInfo property in properties)
         {
             if (!property.CanRead) continue;
-            var _language = property.GetValue(allCountries?.languages!, null);
+            var _language = property.GetValue(languages!, null);
 
             if (_language != null)
             {
@@ -243,7 +271,6 @@ public partial class CountriesList
         }
 
         var languageList = string.Join(", ", languagesMod);
-
         return languageList;
     }
 
@@ -299,7 +326,7 @@ public partial class CountriesList
 
                 //throw;
             }
-        }       
+        }
 
         using var client = new HttpClient();
         HttpResponseMessage response = await client.GetAsync(allCountryUrl);

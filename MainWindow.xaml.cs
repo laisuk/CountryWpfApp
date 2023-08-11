@@ -15,7 +15,7 @@ namespace CountryWpfApp
     {
         public const string countryFilePath = @".\Data\all.json";
         public const string AllCountryUrl = @"https://restcountries.com/v3.1/all";
-        public const string JsonBackupFilePath = @".\Data\all.json.bak";        
+        public const string JsonBackupFilePath = @".\Data\all.json.bak";
         private static List<AllCountries> AllCountryData = CountriesList.GetAllCountryData(countryFilePath);
         public static bool updateComplete;
 
@@ -42,6 +42,7 @@ namespace CountryWpfApp
 
         private void btnGetInfo_Click(object sender, RoutedEventArgs e)
         {
+            if (cbCountryCode.SelectedIndex < 0) return;
             var currentCountry = CountriesList.GetCurrentCountry(AllCountryData, cbCountryCode.SelectedIndex);
             fillCountryForm(currentCountry);
         }
@@ -57,7 +58,7 @@ namespace CountryWpfApp
                 tbRegion.Text = countryModel?.region;
                 tbSubRegion.Text = countryModel?.subregion;
 
-                tbLanguages.Text = CountriesList.GetLanguages(countryModel!);
+                tbLanguages.Text = CountriesList.GetLanguages(countryModel!.languages!);
                 //tbLanguages.Text = CountriesList.GetLanguagesMod(countryModel!);
 
                 tbArea.Text = countryModel?.area + " km²";
@@ -73,7 +74,8 @@ namespace CountryWpfApp
                 tbStartOfWeek.Text = countryModel?.startOfWeek?.ToUpper();
 
                 //string currencies = CountriesList.GetCurrencies(countryModel!); // Regex
-                string currencies = CountriesList.GetCurrenciesRx(countryModel!); // Regex + Serialized IgnoreNull
+                //string currencies = CountriesList.GetCurrenciesRx(countryModel!); // Regex + Serialized IgnoreNull
+                string currencies = CountriesList.GetCurrenciesNodes(countryModel!.currencies!); // JsonNode + Serialized IgnoreNull
                 //string currencies = CountriesList.GetCurrenciesMod(countryModel!); // Hybrid Reflection + Serialized
                 //string currencies = CountriesList.GetCurrenciesModified(countryModel!); // Reflection
                 //string currencies = CountriesList.GetCurrenciesReflection(countryModel!); // Reflection 2
@@ -90,13 +92,13 @@ namespace CountryWpfApp
             Close();
         }
 
-        private void btnUpdateData_Click(object sender, RoutedEventArgs e)
+        private async void btnUpdateData_Click(object sender, RoutedEventArgs e)
         {
             updateComplete = false;
             CountriesList.UpdateJsonDataFile(countryFilePath);
             var length = 500;
 
-            Task.Run(() =>
+            await Task.Run(() =>
             {
                 for (int i = 0; i <= length; i++)
                 {
@@ -110,16 +112,21 @@ namespace CountryWpfApp
                     {
                         break;
                     }
-                    Thread.Sleep(100);
+                    Thread.Sleep(50);
                 }
                 Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     lblFileDate.Content = CountriesList.GetJsonFileDate(countryFilePath);
                     btnUpdateData.IsEnabled = true;
                 }), DispatcherPriority.Render);
-                updateComplete = false;
+                updateComplete = false;                
             });
-            
+
+            //AllCountryData = CountriesList.GetAllCountryData(countryFilePath);
+            //var countryNameList = CountriesList.GetAllCountryNameList(AllCountryData);
+            //cbCountryCode.ItemsSource = countryNameList;
+            //cbCountryCode.SelectedIndex = -1;
+
         }
     }
 }
