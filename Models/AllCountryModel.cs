@@ -1702,6 +1702,7 @@ public class BYN
 public class BAM
 {
     public string? name { get; set; }
+    public string? symbol { get; set; }
 }
 
 public class SZL
